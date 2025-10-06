@@ -1,8 +1,49 @@
+# ============================
+# 🚀 Python Project .gitignore
+# ============================
 
-Ignore_scripts
-Results
+# --- Python cache & bytecode ---
 __pycache__/
 */__pycache__/
 *.py[cod]
-./world_sims/
+*$py.class
+
+# --- Virtual environments ---
+.env
+.venv
+env/
+venv/
+
+# --- Build & distribution ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- IDE / Editor files ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- Logs & temporary files ---
+*.log
+*.tmp
+*.bak
+*.swp
+
+# --- System files ---
+.DS_Store
+Thumbs.db
+
+# --- Project specific folders ---
+Ignore_scripts/
+Results/
+Human/__pycache__/
+world_sims/
+
+# --- Test files ---
 test.py
+
+# --- Optional: Jupyter / IPython ---
+.ipynb_checkpoints/
