@@ -1,4 +1,3 @@
-import time
 import random
 import pandas as pd
 import argparse
@@ -36,17 +35,16 @@ class World_simulation():
 
     def launch(self):
         for _ in range(0, self.limit, self.gap):
-            # Boucle principale de la simuilation qui définie une limite à la simulation et qui avance de la valeur gap (en année) à chaque fois
+            # principal loop of simulation, add one year of each humans
             self.human_loop()
 
-            # Boucle des familles, qui on 1 chance sur 10 de faire un enfant
+            # Family loop of simulation
             self.family_loop()
 
-            # Donnée pour générer des graphiques de la simulation
+            # Data to generate some charts
             self.years_list.append(self.years_list[-1]+1)
             self.count_people_list.append(self.get_population_number())
 
-            time.sleep(0.1)
 
     def human_loop(self):
         for human in range(len(self.world_population)):
@@ -96,23 +94,6 @@ class World_simulation():
                 count += 1
         return count
 
-    def display_population_information(self) -> None:
-        print("-" * 68)
-        print(f"| {'name':<20} | {'health':<20} | {'age':<5} | {'sexuality':<10} |")
-        print("-" * 68)
-        for human in self.get_population_list():
-            print(
-                f"| {human.get_name():<20} | {human.get_health():<20} | {human.get_age():<5} | {human.get_sexuality():<10} |")
-            print("-" * 68)
-
-    def display_adoption_list(self) -> None:
-        print("-" * 68)
-        print(f"| {'name':<20} | {'health':<20} | {'age':<5} | {'sexuality':<10} |")
-        print("-" * 68)
-        for child in self.get_adoption_list():
-            print(
-                f"| {child.get_name():<20} | {child.get_health():<20} | {child.get_age():<5} | {child.get_sexuality():<10} |")
-            print("-" * 68)
 
     def save_simulation(self, excel_file_name: str) -> None:
         world_pop_df = tools.transform_to_dataframe(self.world_population)
@@ -148,4 +129,7 @@ if __name__ == "__main__":
 
     main_simulation.launch()
 
+    tools.display_human_list(main_simulation.get_population_list())
+    tools.display_human_list(main_simulation.get_adoption_list())
+    
     main_simulation.save_simulation(args.file)
