@@ -1,7 +1,8 @@
 
 Ignore_scripts
 Results
-__pycache__
-./Human/__pycache__
+__pycache__/
+*/__pycache__/
+*.py[cod]
 ./world_sims/
 test.py
