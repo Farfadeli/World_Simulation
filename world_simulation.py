@@ -2,7 +2,7 @@ import time
 import random
 import pandas as pd
 import argparse
-from tools import transform_to_dataframe, make_line_charts
+import tools
 from Human.human import Human
 from Human.couple import Couple
 from Human.family import Family
@@ -72,7 +72,13 @@ class World_simulation() :
     def get_population_list(self) -> list[Human] : return self.world_population
     def get_population_number(self) -> int : return len(self.world_population)
     def get_adoption_list(self) -> list[Human] : return self.adoption_list
-
+    def get_female_population_number(self) -> int : 
+        count = 0
+        for human in self.world_population :
+            if human.get_sexuality() == 'F' :
+                count += 1
+        return count
+    
     def display_population_information(self) -> None : 
         print("-" * 68)
         print(f"| {'name':<20} | {'health':<20} | {'age':<5} | {'sexuality':<10} |")
@@ -90,14 +96,14 @@ class World_simulation() :
             print("-" * 68)
 
     def save_simulation(self, excel_file_name : str) -> None :
-        world_pop_df = transform_to_dataframe(self.world_population)
-        adoption_df = transform_to_dataframe(self.adoption_list)
+        world_pop_df = tools.transform_to_dataframe(self.world_population)
+        adoption_df = tools.transform_to_dataframe(self.adoption_list)
         
         with pd.ExcelWriter(excel_file_name) as writer :
             world_pop_df.to_excel(writer, sheet_name="Population", index=False)
             adoption_df.to_excel(writer, sheet_name="Adoption", index=False)
         
-        make_line_charts(self.years_list, self.count_people_list)
+        tools.make_line_charts(self.years_list, self.count_people_list)
     
     
 if __name__ == "__main__" :
