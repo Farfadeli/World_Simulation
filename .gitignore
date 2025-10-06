@@ -1,0 +1,4 @@
+./*.xlsx
+__pycache__
+./Human/__pycache__
+world_sims

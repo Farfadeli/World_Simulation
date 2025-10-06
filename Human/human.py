@@ -1,0 +1,40 @@
+import random
+
+
+class Human() :
+    def __init__(self, name : str, health : str, sexuality : chr) :
+        """
+            name -> Name of the Human
+            health -> 16 bit string which is the equivalent of DNA and define pathologies
+            sexuality -> 'H' for Man and 'F' for Femal
+        """
+        self.name = name
+        self.health = health
+        self.age = 0
+        self.sexuality = sexuality
+        self.in_couple = False
+    
+    def past_year(self) -> None : self.age += 1
+    def catch_disease(self) -> None :
+        new_disease = random.randint(1,50) == 33
+        if new_disease :
+            for e in range(len(self.health)) :
+                if self.health[e] == '0' :
+                    if e != len(self.health) :
+                        self.health = self.health[:e] + '1' + self.health[e+1:]
+                    else :
+                        self.health = self.health[:e] + '1'
+                    break
+    def make_in_couple(self) -> None:
+        self.in_couple = True
+        
+    def get_health(self) -> str : return self.health
+    def get_name(self) -> str : return self.name
+    def get_sexuality(self) -> chr : return self.sexuality
+    def get_age(self) -> int : return self.age
+    def get_in_couple(self) -> bool : return self.in_couple
+
+
+
+
+    
