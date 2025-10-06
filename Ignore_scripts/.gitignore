@@ -1,7 +1,7 @@
 
-./Ignore_scripts
-./Results
-./__pycache__
-./Human/__pycache__
-world_sims
+./Ignore_scripts/
+./Results/
+./__pycache__/
+./Human/__pycache__/
+./world_sims/
 test.py
