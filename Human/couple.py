@@ -2,12 +2,17 @@ from Human.human import Human
 from Human.human_tools import Human_tools
 import random
 
+MENOPAUSE_AGE = 50
+
+
 class Couple() :
     def __init__(self, human_1 : Human, human_2 : Human) :
         self.human_1 = human_1
         self.human_2 = human_2
+        self.is_gay = human_1.get_sexuality() == human_2.get_sexuality()
+        self.is_menopause = (self.human_1.get_sexuality() == 'F' and self.human_1.get_age() > MENOPAUSE_AGE) or (self.human_2.get_sexuality() == 'F' and self.human_2.get_age() > MENOPAUSE_AGE)
 
-    def make_child(self):
+    def make_child(self) :        
         last_name = self.human_1.get_name().split(" ")[-1]
         first_name = Human_tools().make_first_name()
         
@@ -37,5 +42,14 @@ class Couple() :
         return child_health
 
     
-    def adopt_child(self) :
-        pass
+    def adopt_child(self, adoption_list : list[Human]) :
+        if len(adoption_list) == 0 :
+            return None
+        else :
+            child = adoption_list[0]
+            del adoption_list[0]
+            return child
+    
+    
+    def get_is_gay(self) -> bool : return self.is_gay
+    def get_is_menopause(self) -> bool : return self.is_menopause
