@@ -2,7 +2,7 @@ import time
 import random
 import pandas as pd
 import argparse
-from tools import transform_to_dataframe
+from tools import transform_to_dataframe, make_line_charts
 from Human.human import Human
 from Human.couple import Couple
 from Human.family import Family
@@ -22,11 +22,16 @@ class World_simulation() :
         self.couple_list : list[Couple] = []
         self.family_list : list[Family] = []
         self.demography : int = 0
+        
+        self.years_list = []
+        self.count_people_list = []
 
 
     def generate_default_population(self, number_humans : int) :
-        for people in range(number_humans) :
+        for _ in range(number_humans) :
             self.world_population.append(Human(Human_tools().make_name(), '0000000000000000', random.choice(['H', 'F'])))
+        self.years_list.append(0)
+        self.count_people_list.append(number_humans)
 
     def launch(self) :
         for _ in range(0,self.limit, self.gap) :
@@ -59,7 +64,10 @@ class World_simulation() :
                         family.add_children(child)
                     self.world_population.append(child)
             
-            time.sleep(0.25)
+            self.years_list.append(self.years_list[-1]+1)
+            self.count_people_list.append(self.get_population_number())
+            
+            time.sleep(0.1)
             
     def get_population_list(self) -> list[Human] : return self.world_population
     def get_population_number(self) -> int : return len(self.world_population)
@@ -88,6 +96,8 @@ class World_simulation() :
         with pd.ExcelWriter(excel_file_name) as writer :
             world_pop_df.to_excel(writer, sheet_name="Population", index=False)
             adoption_df.to_excel(writer, sheet_name="Adoption", index=False)
+        
+        make_line_charts(self.years_list, self.count_people_list)
     
     
 if __name__ == "__main__" :

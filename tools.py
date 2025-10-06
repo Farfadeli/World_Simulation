@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from Human.human import Human
 
 def transform_to_dataframe(population : list[Human]) -> pd.DataFrame :
@@ -10,3 +11,7 @@ def transform_to_dataframe(population : list[Human]) -> pd.DataFrame :
         result["sexuality"].append(human.get_sexuality())
     
     return pd.DataFrame(result)
+
+def make_line_charts(data_x : list, data_y : list) -> None : 
+    plt.plot(data_x, data_y)
+    plt.show()
