@@ -20,7 +20,7 @@ class Couple() :
         
         sex = random.choice(['H', 'F'])
         
-        return Human(final_name, self.calculate_child_health(), sex)
+        return Human(final_name, self.calculate_child_health(), sex, 0)
     
 
     def calculate_child_health(self) -> str :
@@ -53,3 +53,5 @@ class Couple() :
     
     def get_is_gay(self) -> bool : return self.is_gay
     def get_is_menopause(self) -> bool : return self.is_menopause
+    def get_first_human(self) -> Human : return self.human_1
+    def get_second_human(self) -> Human : return self.human_2

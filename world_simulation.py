@@ -8,12 +8,14 @@ from Human.family import Family
 from Human.human_tools import Human_tools
 
 
-MAKE_CHILD_CHANCE = 8.63
-SEND_TO_ADOPTION_CHANCE = 0.18
+MAKE_CHILD_CHANCE = 8.63  # default percent 8.63
+SEND_TO_ADOPTION_CHANCE = 0.18  # default percent 0.18
 
 
 class World_simulation():
-    def __init__(self, gap: int, limit: int):
+    def __init__(self, simulation_name : str, gap: int, limit: int):
+        self.name = simulation_name
+        
         self.gap = gap
         self.limit = limit
 
@@ -29,9 +31,12 @@ class World_simulation():
     def generate_default_population(self, number_humans: int):
         for _ in range(number_humans):
             self.world_population.append(
-                Human(Human_tools().make_name(), '0000000000000000', random.choice(['H', 'F'])))
+                Human(Human_tools().make_name(), '0000000000000000', random.choice(['H', 'F']), 0))
+
         self.years_list.append(0)
         self.count_people_list.append(number_humans)
+
+# ----------------------------------------------------------------------------------------------------------------------
 
     def launch(self):
         for _ in range(0, self.limit, self.gap):
@@ -44,7 +49,6 @@ class World_simulation():
             # Data to generate some charts
             self.years_list.append(self.years_list[-1]+1)
             self.count_people_list.append(self.get_population_number())
-
 
     def human_loop(self):
         for human in range(len(self.world_population)):
@@ -77,16 +81,21 @@ class World_simulation():
                         family.add_children(child)
                 else:
                     child = family.get_couple().make_child()
+                    child.set_birth_date(self.years_list[-1])
+
                     if random.random()*100 <= SEND_TO_ADOPTION_CHANCE:
                         self.adoption_list.append(child)
                     else:
                         family.add_children(child)
                     self.world_population.append(child)
 
+# ----------------------------------------------------------------------------------------------------------------------
+
     def get_population_list(self) -> list[Human]: return self.world_population
     def get_population_number(self) -> int: return len(self.world_population)
     def get_adoption_list(self) -> list[Human]: return self.adoption_list
-
+    def get_world_simulation_name(self) -> str : return self.name
+    def get_couple_list(self) -> list[Couple] : return self.couple_list
     def get_female_population_number(self) -> int:
         count = 0
         for human in self.world_population:
@@ -94,6 +103,7 @@ class World_simulation():
                 count += 1
         return count
 
+# ----------------------------------------------------------------------------------------------------------------------
 
     def save_simulation(self, excel_file_name: str) -> None:
         world_pop_df = tools.transform_to_dataframe(self.world_population)
@@ -103,33 +113,33 @@ class World_simulation():
             world_pop_df.to_excel(writer, sheet_name="Population", index=False)
             adoption_df.to_excel(writer, sheet_name="Adoption", index=False)
 
-        tools.make_line_charts(self.years_list, self.count_people_list)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
+    parser.add_argument("-n", "--name", type=str,
+                        help="Set the world simulation name")
     parser.add_argument("-p", "--population", type=int,
                         help="Set default population in the world")
     parser.add_argument("-g", "--gap", type=int,
                         help="Set the gap (in year) between each iteration")
     parser.add_argument("-l", "--limit", type=int,
                         help="Set the limit (in year) of the simulation")
-    parser.add_argument("-f", "--file", type=str,
-                        help="set the name of excel file to save")
 
     args = parser.parse_args()
 
-    if (args.population == None or args.gap == None or args.limit == None or args.file == None):
+    if (args.population == None or args.gap == None or args.limit == None or args.name == None):
         exit(1)
 
-    main_simulation = World_simulation(args.gap, args.limit)
+    main_simulation = World_simulation(args.name, args.gap, args.limit)
     main_simulation.generate_default_population(args.population)
 
     main_simulation.launch()
 
     tools.display_human_list(main_simulation.get_population_list())
     tools.display_human_list(main_simulation.get_adoption_list())
-    
-    main_simulation.save_simulation(args.file)
+
+    main_simulation.save_simulation(f"./Results/{args.name}.xlsx")
+    tools.save_simulation_to_database(main_simulation)
