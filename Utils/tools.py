@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 from Human.human import Human
 from world_simulation import World_simulation, MAKE_CHILD_CHANCE, SEND_TO_ADOPTION_CHANCE
 import mysql.connector
-from mysql.connector import errorcode
-from display import display_main_word
+from Utils.display import display_main_word
 
 
 DB = mysql.connector.connect(
@@ -23,26 +22,14 @@ def transform_to_dataframe(population: list[Human]) -> pd.DataFrame:
         result["sexuality"].append(human.get_sexuality())
 
     return pd.DataFrame(result)
+def save_simulation(excel_file_name: str, main_world : World_simulation) -> None:
+        world_pop_df = transform_to_dataframe(main_world.get_population_list())
+        adoption_df = transform_to_dataframe(main_world.get_adoption_list())
 
+        with pd.ExcelWriter(excel_file_name) as writer:
+            world_pop_df.to_excel(writer, sheet_name="Population", index=False)
+            adoption_df.to_excel(writer, sheet_name="Adoption", index=False)
 
-def make_line_charts(data_x: list, data_y: list) -> None:
-    plt.plot(data_x, data_y)
-    plt.show()
-def make_sexuality_pie_chart(total_human: int, female_human: int) -> None:
-    labels = ["Male", "Female"]
-    sizes = [(total_human - female_human), female_human]
-    print(female_human)
-    fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, autopct='%1.1f%%')
-
-
-def display_human_list(human_list: list[Human]) -> bool:
-    print("-" * 68)
-    print(f"| {'name':<20} | {'health':<20} | {'age':<5} | {'sexuality':<10} |")
-    print("-" * 68)
-    for human in human_list:
-        print(f"| {human.get_name():<20} | {human.get_health():<20} | {human.get_age():<5} | {human.get_sexuality():<10} |")
-        print("-" * 68)
 
 def check_database_exist(cursor) -> None:
     cursor.execute("SHOW DATABASES LIKE %s" , ('world_simulation',))
