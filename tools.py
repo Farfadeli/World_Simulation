@@ -4,6 +4,7 @@ from Human.human import Human
 from world_simulation import World_simulation, MAKE_CHILD_CHANCE, SEND_TO_ADOPTION_CHANCE
 import mysql.connector
 from mysql.connector import errorcode
+from display import display_main_word
 
 
 DB = mysql.connector.connect(
@@ -58,6 +59,7 @@ def check_database_exist(cursor) -> None:
     return False       
 
 def save_simulation_to_database(world_simulation: World_simulation):
+    display_main_word("DATABASE")
     cursor = DB.cursor()
     
     database_aleready_exist = check_database_exist(cursor)
@@ -110,13 +112,17 @@ def save_simulation_to_database(world_simulation: World_simulation):
     sql_statement = "INSERT INTO couple(uuid, first_human, second_human, simulation_id) VALUES"
     for couple in world_simulation.get_couple_list() :
         sql_statement += f"('{couple.get_uuid()}', '{couple.get_first_human().get_human_id()}' , '{couple.get_second_human().get_human_id()}', {ID}),"
-    sql_statement = sql_statement[:-1]
+    if sql_statement[-1] != 'S' :
+        sql_statement = sql_statement[:-1]
+        cursor.execute(sql_statement)
+        DB.commit()
     
-    cursor.execute(sql_statement)
-    DB.commit()
-    
-    print(f"✅ Les couples ont été ajouté à la simulation numéro {ID}")
+        print(f"✅ Les couples ont été ajouté à la simulation numéro {ID}")
+    else :
+        print(f"✅ Il n'existe pas de couple dans la simulation numéro {ID}")
         
     
     cursor.close()
     DB.close()
+
+
