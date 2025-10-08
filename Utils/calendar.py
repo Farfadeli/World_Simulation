@@ -1,8 +1,8 @@
 class Calendar() :
     def __init__(self) :
-        self.day = 01
-        self.month = 01
-        self.year = 0
+        self.day = 1
+        self.month = 1
+        self.year = 1970
     
     
     def is_leap_year(self) :
@@ -18,3 +18,15 @@ class Calendar() :
                 self.day = 1
                 self.month = 1
                 self.year += 1
+                
+    def next_year(self) :
+        self.year += 1
+        
+        if self.day == 29 and self.month == 2 :
+            self.month = 3
+            self.day = 1
+            
+    
+    def get_year(self) -> int : return self.year
+    def get_month(self) -> int : return self.month
+    def get_day(self) -> int : return self.day

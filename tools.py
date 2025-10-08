@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from Human.human import Human
-from world_simulation import World_simulation
+from world_simulation import World_simulation, MAKE_CHILD_CHANCE, SEND_TO_ADOPTION_CHANCE
 import mysql.connector
 
 
@@ -51,65 +51,38 @@ def save_simulation_to_database(world_simulation: World_simulation):
 
     # Création de la simulation dans la table simulation
     cursor.execute(
-        f"INSERT INTO simulation(name) VALUES('{world_simulation.get_world_simulation_name()}')")
+        f"INSERT INTO simulation(name, fertility_rate, send_adoption_rate) VALUES('{world_simulation.get_world_simulation_name()}' , {MAKE_CHILD_CHANCE}, {SEND_TO_ADOPTION_CHANCE})")
     DB.commit()
 
-    # sauvegarde des statistiques global de la population
-    # Récupération del'identifiant de la simulation
-    cursor.reset()
-    cursor.execute("SELECT id FROM simulation")
-    res = cursor.fetchall()
+    print(f"✅ La simulation a été créer")
 
-    ID = max(res)[0]
+    # Récupération de l'identifiant de la simulation
+    cursor.execute('SELECT max(id) from simulation')
+    data = cursor.fetchall()
+    ID = data[0][0]
 
-    # Envoyer les données dans la table population
-    cursor.reset()
-    cursor.execute(f"""INSERT INTO population(simulation_id, human_number, female_number, male_number) VALUES(
-                   {ID}, 
-                   {world_simulation.get_population_number()},
-                   {world_simulation.get_female_population_number()},
-                   {world_simulation.get_population_number() - world_simulation.get_female_population_number()})""")
+    # Stockage des humains
+    sql_statement = "INSERT INTO human(uuid, simulation_id, name, health, sexuality, is_gay, in_couple, birth_date) VALUES "
+    for human in world_simulation.get_population_list():
+        sql_statement += f"('{human.get_human_id()}', {ID}, '{human.get_name()}', '{human.get_health()}', '{human.get_sexuality()}', {human.get_is_gay()}, {human.get_in_couple()}, STR_TO_DATE('{human.get_birth_date()}', '%d-%m-%Y')),"
+    sql_statement = sql_statement[:-1]
+    
+    cursor.execute(sql_statement)
     DB.commit()
     
-    print(f"✅ La Population de la simulation numéro {ID} a été sauvegardé")
+    print(f"✅ Les humains ont été ajouté à la simulation numéro {ID}")
     
-    # Sauvegarde de chaque humain de la simulation
-    cursor.reset()
-    for human in world_simulation.get_population_list() :
-        cursor.execute(f"""INSERT INTO humans(simulation_id, human_name, human_health, human_birth_date) VALUES(
-            {ID},
-            '{human.get_name()}',
-            '{human.get_health()}',
-            {human.get_birth_date()})""")
-        
-        DB.commit()
-        
-    print(f"✅ Les humains de la simulation numéro {ID} ont été sauvegardé")
+    # Stockage des couples
     
-    
-    # Sauvegarde des couples
-    cursor.reset()
-    
+    sql_statement = "INSERT INTO couple(uuid, first_human, second_human, simulation_id) VALUES"
     for couple in world_simulation.get_couple_list() :
-        first_human = couple.get_first_human()
-        second_human = couple.get_second_human()
+        sql_statement += f"('{couple.get_uuid()}', '{couple.get_first_human().get_human_id()}' , '{couple.get_second_human().get_human_id()}', {ID}),"
+    sql_statement = sql_statement[:-1]
+    
+    cursor.execute(sql_statement)
+    DB.commit()
+    
+    print(f"✅ Les humains ont été ajouté à la simulation numéro {ID}")
         
-        first_human_id = 0
-        second_human_id = 0
-        
-        cursor.execute(f"SELECT human_id FROM humans WHERE human_name = '{first_human.get_name()}' and human_health = '{first_human.get_health()}' and human_birth_date = {first_human.get_birth_date()}")
-        data = cursor.fetchall()
-        for d in data : first_human_id = d[0]
-        
-        cursor.reset()  
-        
-        cursor.execute(f"SELECT human_id FROM humans WHERE human_name = '{second_human.get_name()}' and human_health = '{second_human.get_health()}' and human_birth_date = {second_human.get_birth_date()}")
-        data = cursor.fetchall()
-        for d in data : second_human_id = d[0]
-        
-        cursor.reset()
-        
-        
-        
-
+    
     cursor.close()

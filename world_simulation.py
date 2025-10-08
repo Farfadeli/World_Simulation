@@ -6,7 +6,7 @@ from Human.human import Human
 from Human.couple import Couple
 from Human.family import Family
 from Human.human_tools import Human_tools
-
+from Utils.calendar import Calendar
 
 MAKE_CHILD_CHANCE = 8.63  # default percent 8.63
 SEND_TO_ADOPTION_CHANCE = 0.18  # default percent 0.18
@@ -15,6 +15,7 @@ SEND_TO_ADOPTION_CHANCE = 0.18  # default percent 0.18
 class World_simulation():
     def __init__(self, simulation_name : str, gap: int, limit: int):
         self.name = simulation_name
+        self.calendar = Calendar()
         
         self.gap = gap
         self.limit = limit
@@ -31,7 +32,7 @@ class World_simulation():
     def generate_default_population(self, number_humans: int):
         for _ in range(number_humans):
             self.world_population.append(
-                Human(Human_tools().make_name(), '0000000000000000', random.choice(['H', 'F']), 0))
+                Human(Human_tools().make_name(), '0000000000000000', random.choice(['H', 'F']), self.calendar))
 
         self.years_list.append(0)
         self.count_people_list.append(number_humans)
@@ -46,6 +47,9 @@ class World_simulation():
             # Family loop of simulation
             self.family_loop()
 
+            # calendar managing
+            self.calendar.next_year()
+            
             # Data to generate some charts
             self.years_list.append(self.years_list[-1]+1)
             self.count_people_list.append(self.get_population_number())
@@ -80,8 +84,7 @@ class World_simulation():
                     else:
                         family.add_children(child)
                 else:
-                    child = family.get_couple().make_child()
-                    child.set_birth_date(self.years_list[-1])
+                    child = family.get_couple().make_child(self.calendar)
 
                     if random.random()*100 <= SEND_TO_ADOPTION_CHANCE:
                         self.adoption_list.append(child)
@@ -137,9 +140,6 @@ if __name__ == "__main__":
     main_simulation.generate_default_population(args.population)
 
     main_simulation.launch()
-
-    tools.display_human_list(main_simulation.get_population_list())
-    tools.display_human_list(main_simulation.get_adoption_list())
 
     main_simulation.save_simulation(f"./Results/{args.name}.xlsx")
     tools.save_simulation_to_database(main_simulation)
