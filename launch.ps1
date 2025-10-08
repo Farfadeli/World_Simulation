@@ -8,7 +8,7 @@ if (Get-Command python -ErrorAction SilentlyContinue) {
 else {
     Write-Host "Python n'est pas installer, installation en cours..."
     $pythonInstaller = "$env:TEMP\python-installer.exe"
-    $url = "https://www.python.org/ftp/python/3.12.6/python-3.12.amd64.exe"
+    $url = "https://www.python.org/ftp/python/3.12.6/python-3.12.6-amd64.exe"
 
     Invoke-WebRequest -Uri $url -OutFile $pythonInstaller
     Write-Host "Installation silencieuse de Python..."
@@ -33,8 +33,7 @@ if (Get-Command pip -ErrorAction SilentlyContinue) {
 
 if(!(Test-path -Path "./world_sims")){
     python -m venv world_sims
-    ./world_sims/Scripts/activate
-    pip install -r requirements.txt
+    ./world_sims/Scripts/python.exe -m pip install -r requirements.txt
     Write-Host "---------------------------------------------------------------------------------"
     Write-Host "L'environnement virtuel vient d'etre configurer"
     Write-Host "---------------------------------------------------------------------------------"
@@ -45,4 +44,4 @@ if(!(Test-path -Path "./world_sims")){
 }
 
 
-python ./world_simulation.py --name $name --population $population --gap $gap --limit $limit
+./world_sims/Scripts/python.exe ./world_simulation.py --name $name --population $population --gap $gap --limit $limit
