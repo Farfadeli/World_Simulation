@@ -27,8 +27,6 @@ def transform_to_dataframe(population: list[Human]) -> pd.DataFrame:
 def make_line_charts(data_x: list, data_y: list) -> None:
     plt.plot(data_x, data_y)
     plt.show()
-
-
 def make_sexuality_pie_chart(total_human: int, female_human: int) -> None:
     labels = ["Male", "Female"]
     sizes = [(total_human - female_human), female_human]
